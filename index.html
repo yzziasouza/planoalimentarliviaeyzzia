@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FitGirl ✦</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#0a0a0a;
+    --surface:#111111;
+    --surface2:#1a1a1a;
+    --border:#2a2a2a;
+    --border-glow:#3d1a4a;
+    --text:#f0f0f0;
+    --text2:#999;
+    --pink:#e879f9;
+    --pink2:#c026d3;
+    --pink-dim:#4a1060;
+    --pink-glow:rgba(232,121,249,0.15);
+    --violet:#a855f7;
+    --violet-dim:#2e1065;
+    --silver:#c0c0c0;
+    --gold:#d4a7f0;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+
+  /* STARS BG */
+  #stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;}
+  .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,2s) ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:0.1;transform:scale(1);}50%{opacity:var(--op,0.8);transform:scale(1.4);}}
+
+  /* LAYOUT */
+  .app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 16px 60px;}
+
+  /* HEADER */
+  header{text-align:center;padding:40px 0 32px;}
+  header h1{font-size:2.2rem;font-weight:700;background:linear-gradient(135deg,#e879f9,#a855f7,#f0abfc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;text-shadow:none;}
+  header p{color:var(--text2);font-size:.85rem;letter-spacing:3px;text-transform:uppercase;margin-top:6px;}
+  .glitter{display:inline-block;animation:spin 4s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* NAV TABS */
+  .tabs{display:flex;gap:8px;margin-bottom:28px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:6px;}
+  .tab{flex:1;padding:10px 8px;border:none;border-radius:10px;background:transparent;color:var(--text2);font-size:.82rem;font-weight:500;cursor:pointer;transition:.2s;letter-spacing:.5px;}
+  .tab.active{background:linear-gradient(135deg,var(--pink-dim),var(--violet-dim));color:var(--pink);border:1px solid var(--border-glow);}
+  .tab:hover:not(.active){color:var(--text);background:var(--surface2);}
+
+  /* SECTIONS */
+  .section{display:none;}
+  .section.active{display:block;}
+
+  /* CARDS */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;}
+  .card-glow{border-color:var(--border-glow);box-shadow:0 0 20px var(--pink-glow);}
+  .card-title{font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--pink);margin-bottom:14px;font-weight:600;}
+
+  /* SHOPPING LIST */
+  .add-row{display:flex;gap:8px;margin-bottom:16px;}
+  .add-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:.9rem;outline:none;}
+  .add-row input:focus{border-color:var(--pink);}
+  .add-row input::placeholder{color:var(--text2);}
+  .btn{padding:10px 18px;border:1px solid var(--border-glow);border-radius:10px;background:linear-gradient(135deg,#2a0a38,#1a0a2e);color:var(--pink);font-size:.85rem;font-weight:500;cursor:pointer;transition:.2s;white-space:nowrap;}
+  .btn:hover{background:linear-gradient(135deg,var(--pink-dim),var(--violet-dim));box-shadow:0 0 12px var(--pink-glow);}
+  .btn-danger{border-color:#4a1a1a;color:#f87171;background:linear-gradient(135deg,#1f0a0a,#2a0a0a);}
+  .btn-danger:hover{background:linear-gradient(135deg,#3a1010,#2a0a0a);box-shadow:0 0 12px rgba(248,113,113,.2);}
+
+  .shop-item{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;transition:.2s;}
+  .shop-item.checked{opacity:.45;}
+  .shop-item.checked .item-name{text-decoration:line-through;color:var(--text2);}
+  .shop-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--pink);cursor:pointer;flex-shrink:0;}
+  .item-name{flex:1;font-size:.9rem;}
+  .item-cat{font-size:.7rem;background:var(--pink-dim);color:var(--pink);padding:2px 8px;border-radius:20px;}
+  .del-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1rem;padding:2px 4px;border-radius:4px;transition:.2s;}
+  .del-btn:hover{color:#f87171;}
+
+  .list-stats{display:flex;gap:12px;margin-bottom:12px;}
+  .stat-pill{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:.78rem;color:var(--text2);}
+  .stat-pill span{color:var(--pink);font-weight:600;}
+
+  /* CARDÁPIO */
+  .day-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;transition:.2s;}
+  .day-header:hover{border-color:var(--border-glow);}
+  .day-name{font-weight:600;font-size:.9rem;}
+  .day-badge{font-size:.7rem;color:var(--text2);}
+  .day-arrow{color:var(--text2);transition:.2s;}
+  .day-open .day-arrow{transform:rotate(180deg);color:var(--pink);}
+  .day-meals{display:none;padding:4px 0 12px;}
+  .day-open .day-meals{display:block;}
+  .meal{background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+  .meal-header{display:flex;align-items:center;gap:10px;padding:10px 14px;}
+  .meal-icon{font-size:1.1rem;}
+  .meal-label{font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--violet);font-weight:600;min-width:100px;}
+  .meal-body{padding:0 14px 10px 44px;}
+  .meal-food{font-size:.88rem;color:var(--text);margin-bottom:4px;}
+  .meal-food .kcal{font-size:.75rem;color:var(--text2);margin-left:8px;}
+  .add-meal-row{display:flex;gap:6px;margin-top:6px;}
+  .add-meal-row input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:.82rem;outline:none;}
+  .add-meal-row input:focus{border-color:var(--pink);}
+  .add-meal-row button{padding:7px 12px;background:var(--pink-dim);border:1px solid var(--border-glow);border-radius:8px;color:var(--pink);font-size:.82rem;cursor:pointer;}
+
+  .free-day{text-align:center;padding:20px;color:var(--pink);font-size:1rem;}
+  .free-day .emoji{font-size:2rem;display:block;margin-bottom:8px;}
+
+  /* HIDRATAÇÃO */
+  .water-big{text-align:center;padding:20px 0 10px;}
+  .water-num{font-size:4rem;font-weight:700;background:linear-gradient(135deg,#7dd3fc,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .water-sub{color:var(--text2);font-size:.85rem;margin-top:4px;}
+  .water-bar-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:30px;height:22px;overflow:hidden;margin:18px 0;}
+  .water-bar{height:100%;border-radius:30px;background:linear-gradient(90deg,#38bdf8,#a855f7);transition:width .5s ease;min-width:0;}
+  .cups-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:16px 0;}
+  .cup{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:.2s;user-select:none;}
+  .cup:hover{border-color:#38bdf8;}
+  .cup.filled{background:linear-gradient(135deg,#0c2a3a,#1a0a2e);border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.2);}
+  .cup-icon{font-size:1.4rem;}
+  .cup-ml{font-size:.65rem;color:var(--text2);}
+  .cup.filled .cup-ml{color:#7dd3fc;}
+  .water-btns{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+  .water-tip{background:var(--surface2);border-left:3px solid var(--violet);border-radius:0 10px 10px 0;padding:12px 16px;font-size:.83rem;color:var(--text2);margin-top:16px;line-height:1.6;}
+  .water-tip strong{color:var(--violet);}
+
+  .progress-ring-wrap{display:flex;justify-content:center;margin:10px 0;}
+
+  /* FOOTER */
+  footer{text-align:center;color:var(--text2);font-size:.72rem;margin-top:40px;letter-spacing:2px;}
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-thumb{background:var(--pink-dim);border-radius:4px;}
+
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+  .float{animation:float 3s ease-in-out infinite;}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="app">
+  <header>
+    <h1>✦ FitGirl ✦</h1>
+    <p>Sua jornada de emagrecimento com brilho</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" onclick="switchTab('shop')">🛒 Lista de compras</button>
+    <button class="tab" onclick="switchTab('menu')">🥗 Cardápio semanal</button>
+    <button class="tab" onclick="switchTab('protein')">💪 Proteína</button>
+    <button class="tab" onclick="switchTab('water')">💧 Hidratação</button>
+  </nav>
+
+  <!-- ===== LISTA DE COMPRAS ===== -->
+  <div class="section active" id="sec-shop">
+    <div class="card card-glow">
+      <div class="card-title">✦ Lista de compras da semana</div>
+      <div class="add-row">
+        <input id="new-item" placeholder="Adicionar item... ex: frango, brócolis" onkeydown="if(event.key==='Enter')addItem()"/>
+        <select id="item-cat" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 10px;color:var(--text);font-size:.85rem;outline:none;">
+          <option value="Proteína">Proteína</option>
+          <option value="Vegetal">Vegetal</option>
+          <option value="Fruta">Fruta</option>
+          <option value="Carboidrato">Carbo</option>
+          <option value="Laticínio">Laticínio</option>
+          <option value="Tempero">Tempero</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <button class="btn" onclick="addItem()">+ Adicionar</button>
+      </div>
+      <div class="list-stats">
+        <div class="stat-pill">Total: <span id="total-count">0</span></div>
+        <div class="stat-pill">Comprados: <span id="checked-count">0</span></div>
+        <div class="stat-pill">Faltam: <span id="remaining-count">0</span></div>
+      </div>
+      <div id="shop-list"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        <button class="btn btn-danger" onclick="clearChecked()">🗑 Remover marcados</button>
+        <button class="btn btn-danger" onclick="resetAll()">↺ Zerar lista</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CARDÁPIO ===== -->
+  <div class="section" id="sec-menu">
+    <div class="card card-glow" style="margin-bottom:12px;">
+      <div class="card-title">✦ Cardápio semanal — foco em emagrecer com prazer</div>
+      <p style="font-size:.8rem;color:var(--text2);line-height:1.6;">Clique em cada dia para expandir as refeições. Use o botão <strong style="color:var(--pink)">+ Adicionar</strong> em qualquer refeição para adaptar ao seu gosto.</p>
+    </div>
+    <div id="menu-container"></div>
+  </div>
+
+  <!-- ===== PROTEÍNA ===== -->
+  <div class="section" id="sec-protein">
+    <div class="card card-glow">
+      <div class="card-title">✦ Controle de proteína diária</div>
+      <div id="protein-summary"></div>
+      <div class="water-bar-wrap" style="margin:14px 0 6px;"><div id="protein-bar" style="height:100%;border-radius:30px;background:linear-gradient(90deg,#e879f9,#a855f7);transition:width .5s ease;min-width:0;width:0%"></div></div>
+      <p style="font-size:.75rem;color:var(--text2);text-align:center;margin-bottom:20px;" id="protein-bar-label"></p>
+
+      <div class="card-title" style="margin-top:4px;">Registrar refeição</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;" id="protein-inputs"></div>
+      <button class="btn" style="width:100%;justify-content:center;" onclick="addProteinMeal()">+ Registrar refeição</button>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">✦ Refeições do dia</div>
+      <div id="protein-log"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">✦ Referência rápida (cru)</div>
+      <div id="protein-ref"></div>
+    </div>
+  </div>
+
+  <!-- ===== HIDRATAÇÃO ===== -->
+  <div class="section" id="sec-water">
+    <div class="card card-glow">
+      <div class="card-title">✦ Controle de hidratação diária</div>
+      <div class="water-big">
+        <div class="water-num" id="water-ml">0 ml</div>
+        <div class="water-sub">Meta: 3.500 ml por dia</div>
+      </div>
+      <div class="water-bar-wrap"><div class="water-bar" id="water-bar" style="width:0%"></div></div>
+
+      <p style="font-size:.78rem;color:var(--text2);text-align:center;margin-bottom:14px;">Toque nos copos para registrar • Cada copo = 500ml</p>
+      <div class="cups-grid" id="cups-grid"></div>
+
+      <div class="water-btns">
+        <button class="btn" onclick="addWater(200)">+ 200 ml</button>
+        <button class="btn" onclick="addWater(500)">+ 500 ml</button>
+        <button class="btn" onclick="addWater(-200)">− 200 ml</button>
+        <button class="btn btn-danger" onclick="resetWater()">↺ Zerar</button>
+      </div>
+
+      <div class="water-tip">
+        <strong>Dicas de hidratação 💜</strong><br>
+        • 1 copo logo ao acordar em jejum<br>
+        • 1 copo 30 min antes de cada refeição<br>
+        • 1 copo entre as refeições<br>
+        • Água com fatia de limão ou folhas de hortelã ajudam a beber mais<br>
+        • Evite beber muito durante a refeição principal
+      </div>
+    </div>
+  </div>
+
+  <footer>✦ feito com carinho para a sua jornada ✦</footer>
+</div>
+
+<script>
+// ──────────────── STARS ────────────────
+(function(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<80;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()*2.5+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*3+1).toFixed(1)}s;--op:${(Math.random()*.7+.3).toFixed(2)};animation-delay:${(Math.random()*3).toFixed(1)}s`;
+    c.appendChild(s);
+  }
+})();
+
+// ──────────────── TABS ────────────────
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const ids=['shop','menu','protein','water'];
+    t.classList.toggle('active',ids[i]===id);
+  });
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+}
+
+// ──────────────── SHOPPING LIST ────────────────
+const defaultItems=[
+  {name:'Frango (peito)',cat:'Proteína',checked:false},
+  {name:'Atum em lata (natural)',cat:'Proteína',checked:false},
+  {name:'Ovos',cat:'Proteína',checked:false},
+  {name:'Carne moída (patinho)',cat:'Proteína',checked:false},
+  {name:'Salmão',cat:'Proteína',checked:false},
+  {name:'Brócolis',cat:'Vegetal',checked:false},
+  {name:'Espinafre',cat:'Vegetal',checked:false},
+  {name:'Abobrinha',cat:'Vegetal',checked:false},
+  {name:'Tomate',cat:'Vegetal',checked:false},
+  {name:'Cenoura',cat:'Vegetal',checked:false},
+  {name:'Alface',cat:'Vegetal',checked:false},
+  {name:'Banana',cat:'Fruta',checked:false},
+  {name:'Maçã',cat:'Fruta',checked:false},
+  {name:'Morango',cat:'Fruta',checked:false},
+  {name:'Mamão',cat:'Fruta',checked:false},
+  {name:'Arroz integral',cat:'Carboidrato',checked:false},
+  {name:'Batata-doce',cat:'Carboidrato',checked:false},
+  {name:'Aveia',cat:'Carboidrato',checked:false},
+  {name:'Pão integral',cat:'Carboidrato',checked:false},
+  {name:'Iogurte natural desnatado',cat:'Laticínio',checked:false},
+  {name:'Queijo cottage',cat:'Laticínio',checked:false},
+  {name:'Leite desnatado',cat:'Laticínio',checked:false},
+  {name:'Azeite de oliva',cat:'Tempero',checked:false},
+  {name:'Limão',cat:'Tempero',checked:false},
+  {name:'Alho',cat:'Tempero',checked:false},
+  {name:'Gengibre',cat:'Tempero',checked:false},
+  {name:'Chocolate 70% cacau',cat:'Outro',checked:false},
+  {name:'Granola sem açúcar',cat:'Outro',checked:false},
+  {name:'Castanha-do-pará',cat:'Outro',checked:false},
+];
+let shopItems=JSON.parse(localStorage.getItem('fitgirl_shop')||'null')||defaultItems.map(i=>({...i}));
+
+function saveShop(){localStorage.setItem('fitgirl_shop',JSON.stringify(shopItems));}
+function renderShop(){
+  const list=document.getElementById('shop-list');
+  list.innerHTML='';
+  const cats=[...new Set(shopItems.map(i=>i.cat))];
+  cats.forEach(cat=>{
+    const items=shopItems.filter(i=>i.cat===cat);
+    const hdr=document.createElement('p');
+    hdr.style.cssText='font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin:12px 0 6px;';
+    hdr.textContent=cat;
+    list.appendChild(hdr);
+    items.forEach((item,_)=>{
+      const idx=shopItems.indexOf(item);
+      const d=document.createElement('div');
+      d.className='shop-item'+(item.checked?' checked':'');
+      d.innerHTML=`<input type="checkbox" ${item.checked?'checked':''} onchange="toggleItem(${idx})"/>
+        <span class="item-name">${item.name}</span>
+        <button class="del-btn" onclick="delItem(${idx})" title="Remover">×</button>`;
+      list.appendChild(d);
+    });
+  });
+  const total=shopItems.length,checked=shopItems.filter(i=>i.checked).length;
+  document.getElementById('total-count').textContent=total;
+  document.getElementById('checked-count').textContent=checked;
+  document.getElementById('remaining-count').textContent=total-checked;
+}
+function toggleItem(i){shopItems[i].checked=!shopItems[i].checked;saveShop();renderShop();}
+function delItem(i){shopItems.splice(i,1);saveShop();renderShop();}
+function addItem(){
+  const inp=document.getElementById('new-item');
+  const cat=document.getElementById('item-cat').value;
+  const v=inp.value.trim();
+  if(!v)return;
+  shopItems.push({name:v,cat,checked:false});
+  inp.value='';
+  saveShop();renderShop();
+}
+function clearChecked(){shopItems=shopItems.filter(i=>!i.checked);saveShop();renderShop();}
+function resetAll(){if(confirm('Zerar toda a lista?')){shopItems=defaultItems.map(i=>({...i}));saveShop();renderShop();}}
+renderShop();
+
+// ──────────────── MENU ────────────────
+const meals=[
+  {icon:'☀️',label:'Café da manhã'},
+  {icon:'🍎',label:'Lanche da manhã'},
+  {icon:'🍽️',label:'Almoço'},
+  {icon:'🫐',label:'Lanche da tarde'},
+  {icon:'🌙',label:'Jantar'},
+];
+const menuData=[
+  {day:'Segunda-feira',tag:'Início de semana',foods:[
+    ['Vitamina de banana com aveia (200ml leite desnatado + 1 banana + 3 col aveia) + 1 ovo mexido','~320kcal'],
+    ['1 maçã + 5 castanhas-do-pará','~130kcal'],
+    ['Arroz integral (4 col) + frango grelhado temperado com limão e alho (150g) + brócolis refogado no azeite + salada de folhas verdes','~480kcal'],
+    ['Iogurte natural desnatado + 1 col sopa de granola sem açúcar + morangos','~160kcal'],
+    ['Omelete de espinafre (2 ovos + espinafre + tomate) + sopa de legumes leve','~300kcal'],
+  ]},
+  {day:'Terça-feira',tag:'',foods:[
+    ['Pão integral (2 fatias) + queijo cottage + 1 ovo cozido + suco de laranja natural (200ml)','~340kcal'],
+    ['Banana + 1 col chá de pasta de amendoim natural','~150kcal'],
+    ['Arroz integral + carne moída refogada (patinho 150g) + cenoura cozida + couve refogada + feijão (4 col)','~510kcal'],
+    ['2 quadradinhos de chocolate 70% + 1 xíc de chá de hibisco','~80kcal'],
+    ['Frango desfiado (120g) + abobrinha grelhada + salada de tomate com azeite e orégano','~320kcal'],
+  ]},
+  {day:'Quarta-feira',tag:'',foods:[
+    ['Iogurte natural + granola + 1 fruta picada (mamão ou maçã) + 1 ovo cozido','~310kcal'],
+    ['Castanhas (8 un) + 1 banana','~140kcal'],
+    ['Salmão assado ao forno com limão e ervas (150g) + batata-doce cozida (100g) + salada verde com tomate','~500kcal'],
+    ['1 fatia de pão integral + queijo cottage + tomate cereja','~150kcal'],
+    ['Atum (1 lata) + legumes cozidos no vapor (cenoura, abobrinha, brócolis) + fio de azeite','~300kcal'],
+  ]},
+  {day:'Quinta-feira',tag:'',foods:[
+    ['Panqueca de aveia (3 col aveia + 1 ovo + 1 banana — sem farinha) + mel (1 col chá) + morangos','~330kcal'],
+    ['Iogurte natural + 1 fruta','~120kcal'],
+    ['Arroz integral + frango grelhado + feijão + couve + salada de alface, tomate e cenoura ralada','~490kcal'],
+    ['2 quadradinhos de chocolate 70% + chá verde','~80kcal'],
+    ['Sopa de legumes com frango desfiado (cenoura, abobrinha, espinafre, batata-doce)','~280kcal'],
+  ]},
+  {day:'Sexta-feira',tag:'Quase lá!',foods:[
+    ['Smoothie verde (espinafre + banana + leite desnatado + aveia) + 1 ovo mexido','~300kcal'],
+    ['Maçã + 5 castanhas','~130kcal'],
+    ['Carne moída (patinho) com legumes salteados + arroz integral + salada caprese','~510kcal'],
+    ['Iogurte grego light + granola','~160kcal'],
+    ['Omelete de atum (2 ovos + atum + tomate + temperos) + salada verde','~290kcal'],
+  ]},
+  {day:'Sábado',tag:'🎉 Dia livre!',free:true},
+  {day:'Domingo',tag:'Última da semana',foods:[
+    ['Pão integral + queijo cottage + ovo cozido + 1 fruta','~340kcal'],
+    ['Vitamina de mamão com aveia','~200kcal'],
+    ['Salmão ou frango assado com batata-doce e legumes grelhados + arroz integral','~520kcal'],
+    ['1 iogurte natural + 2 quadradinhos de chocolate 70%','~150kcal'],
+    ['Frango desfiado + abobrinha + cenoura cozida + fio de azeite','~310kcal'],
+  ]},
+];
+
+let extraFoods=JSON.parse(localStorage.getItem('fitgirl_extra')||'{}');
+function saveExtra(){localStorage.setItem('fitgirl_extra',JSON.stringify(extraFoods));}
+
+function renderMenu(){
+  const c=document.getElementById('menu-container');
+  c.innerHTML='';
+  menuData.forEach((day,di)=>{
+    const wrap=document.createElement('div');
+    wrap.id='day-'+di;
+    const hdr=document.createElement('div');
+    hdr.className='day-header';
+    hdr.innerHTML=`<span class="day-name">${day.day}</span><span class="day-badge">${day.tag}</span><span class="day-arrow">▾</span>`;
+    hdr.onclick=()=>wrap.classList.toggle('day-open');
+    const body=document.createElement('div');
+    body.className='day-meals';
+    if(day.free){
+      body.innerHTML=`<div class="free-day"><span class="emoji">🎉</span>Dia livre! Aproveite com moderação e sem culpa.<br><small style="color:var(--text2)">Só não esqueça da hidratação ✦</small></div>`;
+    } else {
+      const allFoods=[...day.foods,...(extraFoods[di]||[]).map(f=>[f,'extra'])];
+      meals.forEach((meal,mi)=>{
+        const food=allFoods[mi];
+        const mDiv=document.createElement('div');
+        mDiv.className='meal';
+        mDiv.innerHTML=`<div class="meal-header"><span class="meal-icon">${meal.icon}</span><span class="meal-label">${meal.label}</span></div>
+          <div class="meal-body">
+            <div class="meal-food">${food?food[0]:''} <span class="kcal">${food&&food[1]!=='extra'?food[1]:''}</span></div>
+            <div class="add-meal-row">
+              <input placeholder="Adicionar / substituir alimento..." id="add-${di}-${mi}"/>
+              <button onclick="addMealFood(${di},${mi})">+ add</button>
+            </div>
+          </div>`;
+        body.appendChild(mDiv);
+      });
+    }
+    wrap.appendChild(hdr);
+    wrap.appendChild(body);
+    c.appendChild(wrap);
+  });
+}
+function addMealFood(di,mi){
+  const inp=document.getElementById(`add-${di}-${mi}`);
+  const v=inp.value.trim();
+  if(!v)return;
+  if(!extraFoods[di])extraFoods[di]=[];
+  const dayFoods=menuData[di].foods;
+  if(mi<dayFoods.length){dayFoods[mi]=[v,'personalizado'];}
+  else{extraFoods[di].push(v);}
+  inp.value='';
+  saveExtra();renderMenu();
+  document.getElementById('day-'+di).classList.add('day-open');
+}
+renderMenu();
+
+// ──────────────── PROTEÍNA ────────────────
+// Proteína por 100g cru → fator de cozimento aplicado internamente
+const PROTEIN_GOAL = 120; // meta diária em g de proteína
+const PROTEIN_REFS = [
+  {name:'Frango (peito)',unit:'g',portion:200,protPer100:31,carb:0,fat:3.6,icon:'🍗',note:'por porção crua'},
+  {name:'Carne moída (patinho)',unit:'g',portion:200,protPer100:21,carb:0,fat:10,icon:'🥩',note:'por porção crua'},
+  {name:'Salmão',unit:'g',portion:180,protPer100:20,carb:0,fat:13,icon:'🐟',note:'por porção crua'},
+  {name:'Atum (lata natural)',unit:'g',portion:100,protPer100:26,carb:0,fat:1,icon:'🐠',note:'por lata (~100g)'},
+  {name:'Ovo inteiro',unit:'un',portion:1,protPer100:12.5,carb:0.7,fat:9.5,icon:'🥚',note:'por unidade ~60g'},
+  {name:'Arroz integral',unit:'g',portion:90,protPer100:7,carb:77,fat:1,icon:'🍚',note:'por porção crua'},
+  {name:'Macarrão integral',unit:'g',portion:120,protPer100:13,carb:67,fat:1.5,icon:'🍝',note:'por porção cru'},
+  {name:'Iogurte natural',unit:'g',portion:170,protPer100:5.5,carb:6,fat:0.5,icon:'🥛',note:'por pote 170g'},
+  {name:'Queijo cottage',unit:'g',portion:100,protPer100:12,carb:3,fat:4,icon:'🧀',note:'por 100g'},
+];
+
+function calcProt(ref,qty){
+  // ovo: qty = unidades, peso ~60g cada
+  if(ref.unit==='un') return +(ref.protPer100*0.6*qty).toFixed(1);
+  return +(ref.protPer100*(qty/100)).toFixed(1);
+}
+
+let proteinLog = JSON.parse(localStorage.getItem('fitgirl_protein')||'[]');
+// Verifica se log é do dia de hoje
+const todayKey = new Date().toDateString();
+const savedDay = localStorage.getItem('fitgirl_protein_day');
+if(savedDay!==todayKey){proteinLog=[];localStorage.setItem('fitgirl_protein_day',todayKey);localStorage.setItem('fitgirl_protein',JSON.stringify(proteinLog));}
+
+function saveProtein(){localStorage.setItem('fitgirl_protein',JSON.stringify(proteinLog));}
+
+function totalProtein(){return proteinLog.reduce((a,b)=>a+b.prot,0);}
+
+function renderProtein(){
+  const total = totalProtein();
+  const pct = Math.min(total/PROTEIN_GOAL*100,100);
+  const diff = total - PROTEIN_GOAL;
+  const bar = document.getElementById('protein-bar');
+  if(bar) bar.style.width=pct+'%';
+  if(diff>5) bar.style.background='linear-gradient(90deg,#f87171,#e879f9)';
+  else if(diff>0) bar.style.background='linear-gradient(90deg,#fbbf24,#e879f9)';
+  else bar.style.background='linear-gradient(90deg,#e879f9,#a855f7)';
+
+  const label = document.getElementById('protein-bar-label');
+  if(label){
+    if(diff>5) label.innerHTML=`<span style="color:#f87171">⚠️ Passou ${diff.toFixed(0)}g da meta!</span>`;
+    else if(diff>0) label.innerHTML=`<span style="color:#fbbf24">Quase no limite — ${diff.toFixed(0)}g acima</span>`;
+    else if(total===0) label.textContent='Nenhuma proteína registrada ainda';
+    else label.innerHTML=`<span style="color:#e879f9">Faltam ${Math.abs(diff).toFixed(0)}g para bater a meta ✦</span>`;
+  }
+
+  const summary = document.getElementById('protein-summary');
+  if(summary){
+    const color = diff>5?'#f87171':diff>0?'#fbbf24':'#e879f9';
+    summary.innerHTML=`
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;">
+        <div style="text-align:center;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 22px;">
+          <div style="font-size:2.2rem;font-weight:700;color:${color};">${total.toFixed(0)}g</div>
+          <div style="font-size:.72rem;color:var(--text2);margin-top:2px;">consumido</div>
+        </div>
+        <div style="text-align:center;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 22px;">
+          <div style="font-size:2.2rem;font-weight:700;color:var(--violet);">${PROTEIN_GOAL}g</div>
+          <div style="font-size:.72rem;color:var(--text2);margin-top:2px;">meta diária</div>
+        </div>
+        <div style="text-align:center;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 22px;">
+          <div style="font-size:2.2rem;font-weight:700;color:${diff>0?'#f87171':'#34d399'};">${diff>0?'+'+diff.toFixed(0):diff.toFixed(0)}g</div>
+          <div style="font-size:.72rem;color:var(--text2);margin-top:2px;">${diff>0?'excesso':'saldo'}</div>
+        </div>
+      </div>`;
+  }
+
+  // inputs
+  const inp = document.getElementById('protein-inputs');
+  if(inp){
+    inp.innerHTML='';
+    PROTEIN_REFS.forEach((ref,i)=>{
+      const label=ref.unit==='un'?'unidades':'gramas (cru)';
+      inp.innerHTML+=`
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+          <div style="font-size:.78rem;font-weight:500;margin-bottom:6px;">${ref.icon} ${ref.name}</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="inp-${i}" min="0" value="${ref.portion}" style="width:80px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--text);font-size:.85rem;outline:none;"/>
+            <span style="font-size:.72rem;color:var(--text2);">${label}</span>
+          </div>
+          <div style="font-size:.7rem;color:var(--pink);margin-top:4px;" id="preview-${i}">${calcProt(ref,ref.portion)}g prot</div>
+        </div>`;
+    });
+    PROTEIN_REFS.forEach((ref,i)=>{
+      const el=document.getElementById('inp-'+i);
+      if(el) el.addEventListener('input',()=>{
+        const qty=parseFloat(el.value)||0;
+        const prev=document.getElementById('preview-'+i);
+        if(prev) prev.textContent=calcProt(ref,qty)+'g prot';
+      });
+    });
+  }
+
+  // log
+  const log=document.getElementById('protein-log');
+  if(log){
+    if(proteinLog.length===0){log.innerHTML='<p style="font-size:.82rem;color:var(--text2);text-align:center;padding:12px;">Nenhuma refeição registrada ainda hoje.</p>';return;}
+    log.innerHTML=proteinLog.map((entry,i)=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">
+        <div>
+          <div style="font-size:.85rem;font-weight:500;">${entry.name}</div>
+          <div style="font-size:.72rem;color:var(--text2);margin-top:2px;">${entry.qty}${entry.unit==='un'?'un':' g (cru)'} • ${entry.time}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1rem;font-weight:600;color:var(--pink);">+${entry.prot}g</span>
+          <button class="del-btn" onclick="delProtein(${i})" title="Remover">×</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // ref table
+  const refEl=document.getElementById('protein-ref');
+  if(refEl){
+    refEl.innerHTML=`<table style="width:100%;font-size:.8rem;border-collapse:collapse;">
+      <thead><tr style="color:var(--text2);font-size:.7rem;letter-spacing:1px;">
+        <th style="text-align:left;padding:6px 4px;">Alimento</th>
+        <th style="text-align:center;padding:6px 4px;">Porção</th>
+        <th style="text-align:center;padding:6px 4px;">Prot</th>
+        <th style="text-align:center;padding:6px 4px;">Carb</th>
+        <th style="text-align:center;padding:6px 4px;">Fat</th>
+      </tr></thead><tbody>
+      ${PROTEIN_REFS.map(r=>{
+        const qty=r.unit==='un'?1:r.portion;
+        const p=calcProt(r,qty);
+        const c=+(r.carb*(r.unit==='un'?0.6:r.portion/100)).toFixed(1);
+        const f=+(r.fat*(r.unit==='un'?0.6:r.portion/100)).toFixed(1);
+        return `<tr style="border-top:1px solid var(--border);">
+          <td style="padding:8px 4px;">${r.icon} ${r.name}</td>
+          <td style="text-align:center;padding:8px 4px;color:var(--text2);">${r.unit==='un'?'1 un':r.portion+'g'}</td>
+          <td style="text-align:center;padding:8px 4px;color:var(--pink);font-weight:600;">${p}g</td>
+          <td style="text-align:center;padding:8px 4px;color:var(--text2);">${c}g</td>
+          <td style="text-align:center;padding:8px 4px;color:var(--text2);">${f}g</td>
+        </tr>`;
+      }).join('')}</tbody></table>`;
+  }
+}
+
+function addProteinMeal(){
+  const added=[];
+  PROTEIN_REFS.forEach((ref,i)=>{
+    const el=document.getElementById('inp-'+i);
+    if(!el)return;
+    const qty=parseFloat(el.value)||0;
+    if(qty<=0)return;
+    const prot=calcProt(ref,qty);
+    if(prot<=0)return;
+    const now=new Date();
+    const time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+    proteinLog.push({name:ref.icon+' '+ref.name,qty,unit:ref.unit,prot,time});
+    added.push(ref.name);
+    el.value=ref.portion;
+    const prev=document.getElementById('preview-'+i);
+    if(prev)prev.textContent=calcProt(ref,ref.portion)+'g prot';
+  });
+  if(added.length===0){alert('Digite a quantidade de pelo menos um alimento para registrar.');return;}
+  saveProtein();renderProtein();
+}
+function delProtein(i){proteinLog.splice(i,1);saveProtein();renderProtein();}
+renderProtein();
+
+// ──────────────── WATER ────────────────
+const GOAL=3500,CUP=500,CUPS=7;
+let waterMl=parseInt(localStorage.getItem('fitgirl_water')||'0');
+function saveWater(){localStorage.setItem('fitgirl_water',String(waterMl));}
+function renderWater(){
+  const pct=Math.min(waterMl/GOAL*100,100);
+  document.getElementById('water-ml').textContent=waterMl+' ml';
+  document.getElementById('water-bar').style.width=pct+'%';
+  const grid=document.getElementById('cups-grid');
+  grid.innerHTML='';
+  for(let i=0;i<CUPS;i++){
+    const filled=waterMl>=(i+1)*CUP;
+    const half=!filled&&waterMl>i*CUP&&waterMl<(i+1)*CUP;
+    const d=document.createElement('div');
+    d.className='cup'+(filled?' filled':'');
+    d.innerHTML=`<span class="cup-icon">${filled?'🫗':'🥛'}</span><span class="cup-ml">${(i+1)*CUP}ml</span>`;
+    d.onclick=()=>{
+      waterMl=filled?i*CUP:(i+1)*CUP;
+      saveWater();renderWater();
+    };
+    grid.appendChild(d);
+  }
+  if(waterMl>=GOAL){
+    document.getElementById('water-ml').style.background='linear-gradient(135deg,#34d399,#a855f7)';
+    document.getElementById('water-ml').style['-webkit-background-clip']='text';
+    document.getElementById('water-ml').style['-webkit-text-fill-color']='transparent';
+  } else {
+    document.getElementById('water-ml').style.background='linear-gradient(135deg,#7dd3fc,#a855f7)';
+    document.getElementById('water-ml').style['-webkit-background-clip']='text';
+    document.getElementById('water-ml').style['-webkit-text-fill-color']='transparent';
+  }
+}
+function addWater(ml){waterMl=Math.max(0,waterMl+ml);saveWater();renderWater();}
+function resetWater(){waterMl=0;saveWater();renderWater();}
+renderWater();
+</script>
+</body>
+</html>
